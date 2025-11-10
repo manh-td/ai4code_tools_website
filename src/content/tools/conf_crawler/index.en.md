@@ -1,5 +1,5 @@
 ---
-title: "Conference & Journal Papers Crawler"
+title: "Conference Links"
 date: 2025-03-02T11:31:51+07:00
 author: "Dung Chinh Tran, Duc Manh Tran"
 draft: false

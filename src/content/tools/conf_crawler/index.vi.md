@@ -1,5 +1,5 @@
 ---
-title: "Conference & Journal Papers Crawler"
+title: "Conference Links"
 date: 2025-03-02T11:31:42+07:00
 author: "Trần Dương Chính, Trần Đức Mạnh"
 draft: false
