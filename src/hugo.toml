@@ -1,0 +1,7 @@
+baseURL = 'http://example.org/'
+languageCode = 'en'
+title = 'AI4Code'
+theme = 'mytheme'
+
+[markup.goldmark.renderer]
+  unsafe = true

@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container max-width-lg">
+        <a class="navbar-brand" href="{{ .Language.Lang | relLangURL }}">AI4Code Toolbox</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href='{{ "tools/" | relLangURL }}'>{{ T "tools" }}</a>
+                <a class="nav-link" href='{{ "about/" | relLangURL }}'>{{ T "about" }}</a>
+            </div>
+            <div class="navbar float-end">
+                <a class="nav-link dropdown-toggle px-3" href="#" role="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    {{ .Site.Language.Lang }}
+                </a>
+                <ul class="dropdown-menu">
+                    {{- $current := . -}}
+                    {{ range .AllTranslations }}
+                    <li>
+                        {{ if ne $current.Language.LanguageCode .Language.LanguageCode }}
+                        <a class="dropdown-item" href="{{ .RelPermalink }}">{{ .Language.Lang }}</a>
+                        {{ else }}
+                        <span class="dropdown-item active">{{ .Language.Lang }}</span>
+                        {{ end }}
+                    </li>
+                    {{ end }}
+                </ul>
+                <li class="nav-item align-items-center d-flex">
+                    <i class="fas fa-sun"></i>
+                    <div class="ms-2 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="themingSwitcher" />
+                    </div>
+                    <i class="fas fa-moon"></i>
+                </li>
+                <!-- Add GitHub Button -->
+                <a href="{{ with .Params.githubURL }}{{ . }}{{ else }}{{ .Site.Params.githubURL }}{{ end }}"
+                    target="_blank" class="btn btn-outline-secondary ms-3">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

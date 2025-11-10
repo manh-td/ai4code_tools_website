@@ -1,0 +1,14 @@
+<div class="card mb-3 border emp">
+    <div class="card-body">
+        <h3 class="card-title">
+            <a href="{{ .Permalink }}" class="stretched-link nav-link">{{ .Title }}</a>
+        </h3>
+        <p class="card-text">
+            {{ .Summary }} <span class="text-secondary">...</span>
+        </p>
+        <p class="card-text text-secondary">
+            <i class="far fa-user"></i> {{ .Params.author }} <br>
+            <i class="far fa-calendar"></i> {{ .PublishDate.Format "Jan 2, 2006" }}
+        </p>
+    </div>
+</div>

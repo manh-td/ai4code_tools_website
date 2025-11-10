@@ -1,0 +1,12 @@
+# Theme config.
+defaultContentLanguage = "en"
+defaultContentLanguageInSubdir = true  # Forces Hugo to put default language in its own subdirectory
+[languages]
+  [languages.en]
+    disabled = false
+    languageName = "English"
+    weight = 1
+  [languages.vi]
+    disabled = false
+    languageName = "Tiếng Việt"
+    weight = 2

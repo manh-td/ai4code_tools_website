@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+
+body {
+    font-family: 'Reddit Sans', sans-serif;
+}
+
+blockquote {
+    font-size: 0.9em;
+    width: 100%;
+    font-style: italic;
+    border-left: 8px solid #63aada;
+    position: relative;
+    padding: 0.5em;
+    background: #83838320;
+    border-radius: 0.2em;
+}
+
+pre {
+    padding: 0.5em;
+    border-radius: 0.2em;
+    border: 1px solid #cccccc20;
+}

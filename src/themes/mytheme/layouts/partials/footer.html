@@ -1,0 +1,54 @@
+<footer class="text-center bg-body">
+    <!-- Copyright -->
+    <div class="text-center p-3 bg-body-tertiary text-body">
+        ©
+        <script>document.write(new Date().getFullYear())</script> Copyright AI4Code@HUST
+    </div>
+    <!-- Copyright -->
+</footer>
+
+{{/* Bootstrap 5 JS */}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+<!-- MDB -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.2.0/mdb.umd.min.js"></script>
+
+{{/* Custom JS */}}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeSwitcher = document.getElementById("themingSwitcher");
+        if (!themeSwitcher) return;
+
+        const htmlElement = document.documentElement;
+        const storedTheme = localStorage.getItem("theme");
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        // Determine theme: stored preference > system preference > default light
+        let theme = storedTheme || (systemPrefersDark ? "dark" : "light");
+
+        // Apply theme and update switcher
+        htmlElement.setAttribute("data-bs-theme", theme);
+        themeSwitcher.checked = theme === "dark";
+
+        // Function to toggle theme
+        const toggleTheme = (isChecked) => {
+            const newTheme = isChecked ? "dark" : "light";
+            htmlElement.setAttribute("data-bs-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+        };
+
+        // Toggle theme on switch click
+        themeSwitcher.addEventListener("change", (e) => {
+            toggleTheme(e.target.checked);
+        });
+
+        // Toggle theme with Shift + D
+        document.addEventListener("keydown", (e) => {
+            if (e.shiftKey && e.key === "D") {
+                themeSwitcher.checked = !themeSwitcher.checked;
+                toggleTheme(themeSwitcher.checked);
+            }
+        });
+    });
+</script>

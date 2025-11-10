@@ -1,0 +1,6 @@
+{{ $jsFile := .Page.Resources.GetMatch (.Get "path") }}
+{{ if $jsFile }}
+<script src="{{ $jsFile.RelPermalink }}"></script>
+{{ else }}
+<p>JavaScript file not found: {{ .Get "path" }}</p>
+{{ end }}

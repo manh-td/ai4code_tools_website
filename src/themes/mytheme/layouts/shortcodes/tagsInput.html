@@ -1,0 +1,7 @@
+{{ $id := .Get "id" }}
+{{ $label := .Get "label" }}
+
+<div class="form-floating mb-3">
+    <input type="text" class="form-control form-control-sm" id="{{ $id }}" />
+    <label for="{{ $id }}">{{ $label }}</label>
+</div>

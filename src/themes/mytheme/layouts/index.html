@@ -1,0 +1,11 @@
+{{ define "main" }}
+{{ .Content }}
+
+<div>
+    {{ range .Paginator.Pages }}
+    {{- partial "horizontal_card.html" . -}}
+    {{ end }}
+    {{- partial "pagination.html" . -}}
+</div>
+
+{{ end }}
