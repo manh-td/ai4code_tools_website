@@ -16,9 +16,7 @@ css:
 githubURL: "https://github.com/AI4Code-HUST/conf-crawler"
 ---
 
-# Conference & Journal Papers Crawler
-
-A tool designed to automatically extract and organize academic publications from conference and journal websites. By parsing the websites, this project collects metadata such as article titles and theirs links to help researchers stay updated with the latest publications in their field.
+# Conference Links
 
 ---
 

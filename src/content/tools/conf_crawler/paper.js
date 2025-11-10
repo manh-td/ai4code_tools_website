@@ -4,11 +4,11 @@ const keywordInput = UseBootstrapTag(document.getElementById("keywords"));
 let papers = [];
 let filteredPapers = [];
 
-const pageSize = 20; // Number of papers per page
-let currentPage = 1; // Current page number
+const pageSize = 20;
+let currentPage = 1;
 
 fetch(
-    "https://raw.githubusercontent.com/AI4Code-HUST/conf-crawler/refs/heads/main/outputs/papers.jsonl"
+    "https://raw.githubusercontent.com/manh-td/conference-links/refs/heads/main/results.jsonl"
 )
     .then((response) => {
         if (!response.ok) {
@@ -21,12 +21,11 @@ fetch(
             .trim()
             .split("\n")
             .map((line) => JSON.parse(line));
+
         filteredPapers = papers;
-        console.log(filteredPapers);
         updateTable(filteredPapers);
 
         const pageNumberInput = document.getElementById("page-number-input");
-
         pageNumberInput.addEventListener("change", () => {
             const pageNumber = parseInt(pageNumberInput.value, 10);
             if (!isNaN(pageNumber)) {
@@ -37,132 +36,82 @@ fetch(
         });
 
         const saveFilterButton = document.getElementById("paperFilterButton");
-
         saveFilterButton.addEventListener("click", saveFilter);
     });
 
 function filterPapers(papers, selectedYears, keywords) {
-    return papers
-        .map((paper, index) => {
-            // Check if 'paper' is null or undefined
-            if (!paper) {
-                console.warn(`Paper at index ${index} is ${paper}`);
-                return null;
-            }
+    return papers.filter((paper) => {
+        const yearMatch =
+            selectedYears.length === 0 || selectedYears.includes(paper.year);
 
-            // Check if 'paper.conference' exists and is a string
-            if (typeof paper.conference !== 'string') {
-                console.warn(`'conference' property at index ${index} is not a string:`, paper.conference);
-                return null;
-            }
-
-            // Extract the year from the conference string using a regular expression
-            const conferenceMatch = paper.conference.match(/\d{4}/);
-            if (!conferenceMatch) {
-                console.warn(`No 4-digit year found in 'conference' property at index ${index}:`, paper.conference);
-            }
-            const conferenceYear = conferenceMatch ? conferenceMatch[0] : null;
-
-            // Check if the paper's conference year matches any of the selected years
-            const yearMatch =
-                selectedYears.length === 0 ||
-                (conferenceYear && selectedYears.includes(conferenceYear));
-
-            // Check if 'paper.paper' exists and is a string
-            if (typeof paper.paper !== 'string') {
-                console.warn(`'paper' property at index ${index} is not a string:`, paper.paper);
-                return null;
-            }
-
-            // Find matched keywords in the paper's title
-            const matchedKeywords = keywords.filter((keyword) =>
-                paper.paper.toLowerCase().includes(keyword.toLowerCase())
+        const keywordMatch =
+            keywords.length === 0 ||
+            keywords.some((kw) =>
+                (paper.conference + " " + paper.links.join(" "))
+                    .toLowerCase()
+                    .includes(kw.toLowerCase())
             );
 
-            // Check if the paper's title contains any of the keywords
-            const keywordMatch = keywords.length === 0 || matchedKeywords.length == keywords.length;
-
-            // Include the paper in the filtered results only if both checks pass
-            return yearMatch && keywordMatch
-                ? { ...paper, keywords: matchedKeywords.join(", ") }
-                : null;
-        })
-        .filter((paper) => paper !== null); // Remove null values from the array
+        return yearMatch && keywordMatch;
+    });
 }
-
 
 function renderTable(papers) {
     const table = document.createElement("table");
     table.classList.add("table", "table-striped", "table-bordered", "table-hover");
 
-    // Create table headers
+    // Headers
     const thead = document.createElement("thead");
     const headerRow = document.createElement("tr");
-    const headers = ["conference", "paper", "keywords"];
-    headers.forEach((header) => {
+    ["Year", "Conference", "Links"].forEach((header) => {
         const th = document.createElement("th");
-        th.textContent = header.charAt(0).toUpperCase() + header.slice(1);
+        th.textContent = header;
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
-    // Create table body
     const tbody = document.createElement("tbody");
     const paginatedPapers = paginate(papers, pageSize, currentPage);
-    paginatedPapers.forEach((paper) => {
+
+    if (paginatedPapers.length === 0) {
         const row = document.createElement("tr");
-
-        const conf = document.createElement("td");
-        conf.innerHTML = "<a href='" + paper['conf_url'] + "' target='_blank' >" + paper['conference'] + "</a>";
-        row.appendChild(conf);
-
-        const name = document.createElement("td");
-        name.innerHTML = "<a href='" + paper['paper_url'] + "' target='_blank' >" + paper['paper'] + "</a>";
-        row.appendChild(name);
-
-        const word = document.createElement("td");
-        if (paper.keywords && paper.keywords.length > 0) {
-            word.textContent = paper.keywords;
-        } else {
-            word.textContent = "";
-        }
-
-        row.appendChild(word);
-
-
+        const td = document.createElement("td");
+        td.colSpan = 3;
+        td.textContent = "No results found.";
+        td.classList.add("text-center");
+        row.appendChild(td);
         tbody.appendChild(row);
-    });
-    if (papers.length == 0) {
-        placeholder = `
-            <p class="placeholder-glow">
-                <span class="placeholder col-12"></span>
-            </p>
-        `;
-
-        for (i = 0; i < 5; i++) {
+    } else {
+        paginatedPapers.forEach((paper) => {
             const row = document.createElement("tr");
 
-            const conf = document.createElement("td");
-            conf.innerHTML = placeholder;
-            row.appendChild(conf);
+            const yearCell = document.createElement("td");
+            yearCell.textContent = paper.year;
+            row.appendChild(yearCell);
 
-            const name = document.createElement("td");
-            name.innerHTML = placeholder;
-            row.appendChild(name);
+            const confCell = document.createElement("td");
+            confCell.textContent = paper.conference;
+            row.appendChild(confCell);
 
-            const word = document.createElement("td");
-            word.innerHTML = placeholder;
-            row.appendChild(word);
+            const linksCell = document.createElement("td");
+            const linkList = paper.links
+                .map(
+                    (url) =>
+                        `<a href="${url}" target="_blank">${url}</a>`
+                )
+                .join("<br>");
+            linksCell.innerHTML = linkList;
+            row.appendChild(linksCell);
 
             tbody.appendChild(row);
-        }
+        });
     }
+
     table.appendChild(tbody);
 
-    // Append the table to the DOM
     const tableContainer = document.getElementById("papersTable");
-    tableContainer.innerHTML = ""; // Clear any existing content
+    tableContainer.innerHTML = "";
     tableContainer.appendChild(table);
 }
 
@@ -173,14 +122,12 @@ function paginate(papers, pageSize, pageNumber) {
 
 function renderPaginationControls(papers) {
     const paginationContainer = document.getElementById("pagination-controls");
-    paginationContainer.innerHTML = ""; // Clear existing controls
+    paginationContainer.innerHTML = "";
 
     const totalPages = Math.ceil(papers.length / pageSize);
-
     const numberPages = document.getElementById("total-pages");
     numberPages.innerHTML = "of " + totalPages;
 
-    // Helper function to create page items
     function createPageItem(label, page, disabled = false, active = false) {
         const listItem = document.createElement("li");
         listItem.className = `page-item${active ? ' active' : ''}${disabled ? ' disabled' : ''}`;
@@ -201,28 +148,21 @@ function renderPaginationControls(papers) {
         return listItem;
     }
 
-    // First Page Button
     paginationContainer.appendChild(createPageItem('&laquo;', 1, currentPage === 1));
-
-    // Previous Page Button
     paginationContainer.appendChild(createPageItem('&#8249;', currentPage - 1, currentPage === 1));
 
-    // Page Number Buttons
     const start = Math.max(currentPage - 1, 1);
     const end = Math.min(currentPage + 1, totalPages);
     for (let i = start; i <= end; i++) {
         paginationContainer.appendChild(createPageItem(i, i, false, i === currentPage));
     }
 
-    // Next Page Button
     paginationContainer.appendChild(createPageItem('&#8250;', currentPage + 1, currentPage === totalPages));
-
-    // Last Page Button
     paginationContainer.appendChild(createPageItem('&raquo;', totalPages, currentPage === totalPages));
 }
 
 function goToPage(pageNumber) {
-    const totalPages = Math.ceil(papers.length / pageSize);
+    const totalPages = Math.ceil(filteredPapers.length / pageSize);
     if (pageNumber >= 1 && pageNumber <= totalPages) {
         currentPage = pageNumber;
         updateTable(filteredPapers);
@@ -237,12 +177,13 @@ function updateTable(papers) {
 }
 
 function saveFilter() {
-    updateTable([])
-    years = yearInput.getValues();
-    words = keywordInput.getValues()
+    updateTable([]);
+    const years = yearInput.getValues();
+    const words = keywordInput.getValues();
     filteredPapers = filterPapers(papers, years, words);
-    console.log(filteredPapers);
+    currentPage = 1;
     updateTable(filteredPapers);
 }
 
-renderTable(papers)
+// Initial render (empty placeholder)
+renderTable([]);
