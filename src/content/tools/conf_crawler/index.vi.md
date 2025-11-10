@@ -13,7 +13,7 @@ css:
     "https://cdn.jsdelivr.net/npm/use-bootstrap-tag@2.2.2/dist/use-bootstrap-tag.min.css",
     "https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
   ]
-githubURL: "https://github.com/AI4Code-HUST/conf-crawler"
+githubURL: "https://github.com/manh-td/conference-links"
 ---
 # Conference Links
 
