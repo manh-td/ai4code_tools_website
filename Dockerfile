@@ -1,5 +1,5 @@
 # Use the official Golang image as the base image
-FROM golang:1.23.0-bullseye AS builder
+FROM golang:1.24-bullseye AS builder
 
 # Set environment variables
 ENV CGO_ENABLED=1
@@ -22,7 +22,8 @@ RUN git clone https://github.com/gohugoio/hugo.git .
 RUN git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
 
 # Build the extended version of Hugo
-RUN go install -tags extended
+# Use an explicit package pattern so the Hugo binary is built and installed
+RUN go install -tags extended ./...
 
 # Create a minimal image for the Hugo binary
 FROM debian:bullseye-slim
