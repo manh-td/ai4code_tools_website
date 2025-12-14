@@ -4,41 +4,75 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const baseUrl = 'https://raw.githubusercontent.com/manh-td/ai-papers-crawler/refs/heads/main/outputs/papers/all_papers.jsonl';
 
-  async function loadRemotePapers(dateString = null) {
+  async function loadRemotePapers() {
     try {
       const res = await fetch(baseUrl);
       if (!res.ok) throw new Error('Network response not ok');
+
       const text = await res.text();
       const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+      const currentYear = String(new Date().getFullYear());
       const papers = [];
+
       for (const line of lines) {
         try {
           const obj = JSON.parse(line);
-          const title = obj.title || obj.paper_title || obj.name || obj.title_text || '';
-          let desc = '';
-          const authors = obj.conference ? ('<strong>Conference</strong>: ' + obj.conference) : '';
-          const rawUrl = obj.url || obj.pdf || obj.pdf_url || obj.arxiv_url || obj.source || obj.link || '';
-          // If no direct URL is available, fall back to a Google search for the title
-          const url = rawUrl || (title ? ('https://www.google.com/search?q=' + encodeURIComponent(title)) : '');
 
-          papers.push({ title, desc, authors, url });
+          const title =
+            obj.title ||
+            obj.paper_title ||
+            obj.name ||
+            obj.title_text ||
+            '';
+
+          const conference = obj.conference || '';
+
+          // ✅ FILTER: only keep papers whose conference contains this year
+          if (!conference.includes(currentYear)) continue;
+
+          const authors = conference
+            ? ('<strong>Conference</strong>: ' + conference)
+            : '';
+
+          const rawUrl =
+            obj.url ||
+            obj.pdf ||
+            obj.pdf_url ||
+            obj.arxiv_url ||
+            obj.source ||
+            obj.link ||
+            '';
+
+          const url = rawUrl || (title
+            ? 'https://www.google.com/search?q=' + encodeURIComponent(title)
+            : '');
+
+          papers.push({
+            title,
+            desc: '',
+            authors,
+            url
+          });
+
         } catch (err) {
           // ignore invalid JSON lines
         }
       }
-      // Randomly sample up to 20 papers to limit client-side processing
+
+      // ✅ LIMIT TO 20 RANDOM PAPERS
       const MAX_PAPERS = 20;
 
       if (papers.length > MAX_PAPERS) {
         for (let i = papers.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          const tmp = papers[i]; papers[i] = papers[j]; papers[j] = tmp;
+          [papers[i], papers[j]] = [papers[j], papers[i]];
         }
         return papers.slice(0, MAX_PAPERS);
       }
 
-      if (papers.length) return papers;
-      return null;
+      return papers.length ? papers : null;
+
     } catch (e) {
       return null;
     }
@@ -135,33 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
       removeTop('right', url);
     }
   });
-
-  // Wire date picker to reload stack for selected date
-  const datePicker = document.getElementById('selectedDate');
-  const applyDateFilter = document.getElementById('applyDateFilter');
-  if (applyDateFilter && datePicker) {
-    applyDateFilter.addEventListener('click', async () => {
-      const selectedDate = datePicker.value; // YYYY-MM-DD or empty
-      if (selectedDate) {
-        // Try remote per-date file
-        const remote = await loadRemotePapers(selectedDate);
-        if (remote && remote.length) {
-          const mapped = remote.map((p) => ({
-            title: p.title || 'No title',
-            desc: p.desc || p.abstract || '',
-            authors: p.authors || '',
-            url: p.url || '',
-          }));
-          renderCards(mapped);
-        } else {
-          // No data for date: clear to sentinel only
-          renderCards([]);
-        }
-      } else {
-        alert('Please select a valid date.');
-      }
-    });
-  }
 
   // Simple HTML-escape to avoid injection from titles
   function escapeHtml(unsafe) {
