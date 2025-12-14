@@ -1,6 +1,6 @@
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
   const stack = document.querySelector('.tinder-stack');
-  if(!stack) return;
+  if (!stack) return;
 
   const baseUrl = 'https://raw.githubusercontent.com/manh-td/ai-papers-crawler/refs/heads/main/outputs/papers/all_papers.jsonl';
 
@@ -26,14 +26,17 @@ document.addEventListener('DOMContentLoaded', function(){
           // ignore invalid JSON lines
         }
       }
-      // Randomly sample up to 100 papers to limit client-side processing
-      if (papers.length > 100) {
+      // Randomly sample up to 20 papers to limit client-side processing
+      const MAX_PAPERS = 20;
+
+      if (papers.length > MAX_PAPERS) {
         for (let i = papers.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           const tmp = papers[i]; papers[i] = papers[j]; papers[j] = tmp;
         }
-        return papers.slice(0, 100);
+        return papers.slice(0, MAX_PAPERS);
       }
+
       if (papers.length) return papers;
       return null;
     } catch (e) {
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function(){
     { title: 'Example Paper C', desc: '<strong>Topics:</strong> RL', authors: '', url: '' },
   ];
 
-  (async function(){
+  (async function () {
     const remote = await loadRemotePapers();
     if (remote && remote.length) {
       const mapped = remote.map((p) => ({
@@ -106,28 +109,28 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function removeTop(direction, url) {
     const top = getTopCard();
-    if(!top) return;
+    if (!top) return;
     top.classList.add(direction === 'left' ? 'gone-left' : 'gone-right');
-    if(url) {
-      try { window.open(url, '_blank'); } catch(e) {}
+    if (url) {
+      try { window.open(url, '_blank'); } catch (e) { }
     }
     setTimeout(() => { if (top && top.parentNode) top.remove(); }, 300);
   }
 
-  stack.addEventListener('click', function(e){
+  stack.addEventListener('click', function (e) {
     const target = e.target;
     if (target.classList.contains('pass')) {
       const top = getTopCard();
-      if(!top) return;
+      if (!top) return;
       const card = target.closest('.card');
-      if(card !== top) return;
+      if (card !== top) return;
       removeTop('left');
     }
     if (target.classList.contains('interesting')) {
       const top = getTopCard();
-      if(!top) return;
+      if (!top) return;
       const card = target.closest('.card');
-      if(card !== top) return;
+      if (card !== top) return;
       const url = top.dataset.url;
       removeTop('right', url);
     }
@@ -163,8 +166,8 @@ document.addEventListener('DOMContentLoaded', function(){
   // Simple HTML-escape to avoid injection from titles
   function escapeHtml(unsafe) {
     if (!unsafe) return '';
-    return unsafe.replace(/[&<>"']/g, function(m) {
-      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[m];
+    return unsafe.replace(/[&<>"']/g, function (m) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#39;" })[m];
     });
   }
 });
